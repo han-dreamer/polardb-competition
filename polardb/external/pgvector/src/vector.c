@@ -21,6 +21,7 @@
 #include "utils/lsyscache.h"
 #include "utils/numeric.h"
 #include "vector.h"
+#include "simd_dist.h"
 
 #if PG_VERSION_NUM >= 160000
 #include "varatt.h"
@@ -52,6 +53,8 @@ _PG_init(void)
 	HalfvecInit();
 	HnswInit();
 	IvfflatInit();
+	/* Initialize SIMD runtime dispatch (detect CPU features). Safe no-op if unsupported. */
+	SimdInit();
 }
 
 /*
@@ -549,17 +552,8 @@ halfvec_to_vector(PG_FUNCTION_ARGS)
 VECTOR_TARGET_CLONES static float
 VectorL2SquaredDistance(int dim, float *ax, float *bx)
 {
-	float		distance = 0.0;
-
-	/* Auto-vectorized */
-	for (int i = 0; i < dim; i++)
-	{
-		float		diff = ax[i] - bx[i];
-
-		distance += diff * diff;
-	}
-
-	return distance;
+    /* Delegate to SIMD-optimized implementation when available */
+    return SimdL2SquaredDistance(dim, ax, bx);
 }
 
 /*
@@ -596,13 +590,8 @@ vector_l2_squared_distance(PG_FUNCTION_ARGS)
 VECTOR_TARGET_CLONES static float
 VectorInnerProduct(int dim, float *ax, float *bx)
 {
-	float		distance = 0.0;
-
-	/* Auto-vectorized */
-	for (int i = 0; i < dim; i++)
-		distance += ax[i] * bx[i];
-
-	return distance;
+    /* Delegate to SIMD-optimized implementation when available */
+    return SimdInnerProduct(dim, ax, bx);
 }
 
 /*

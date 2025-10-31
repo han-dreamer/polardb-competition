@@ -85,6 +85,9 @@ avx2_l2(int dim, const float *a, const float *b)
 {
     int i = 0;
     __m256 vsum = _mm256_setzero_ps();
+    /* declarations first to satisfy ISO C90 */
+    float buf[8];
+    float sum = 0.0f;
 
     for (; i + 7 < dim; i += 8)
     {
@@ -99,9 +102,8 @@ avx2_l2(int dim, const float *a, const float *b)
 #endif
     }
 
-    float buf[8];
     _mm256_storeu_ps(buf, vsum);
-    float sum = buf[0] + buf[1] + buf[2] + buf[3] + buf[4] + buf[5] + buf[6] + buf[7];
+    sum = buf[0] + buf[1] + buf[2] + buf[3] + buf[4] + buf[5] + buf[6] + buf[7];
 
     for (; i < dim; i++)
     {
@@ -117,6 +119,9 @@ avx2_dot(int dim, const float *a, const float *b)
 {
     int i = 0;
     __m256 vsum = _mm256_setzero_ps();
+    /* declarations first to satisfy ISO C90 */
+    float buf[8];
+    float sum = 0.0f;
 
     for (; i + 7 < dim; i += 8)
     {
@@ -130,13 +135,11 @@ avx2_dot(int dim, const float *a, const float *b)
 #endif
     }
 
-    float buf[8];
     _mm256_storeu_ps(buf, vsum);
-    float sum = buf[0] + buf[1] + buf[2] + buf[3] + buf[4] + buf[5] + buf[6] + buf[7];
+    sum = buf[0] + buf[1] + buf[2] + buf[3] + buf[4] + buf[5] + buf[6] + buf[7];
 
     for (; i < dim; i++)
         sum += a[i] * b[i];
 
     return sum;
 }
-

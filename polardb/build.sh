@@ -288,46 +288,12 @@ BASE_DIR="$HOME"
 PGDATA="$BASE_DIR/tmp_polardb_pg_15_primary"
 CONFIG_FILE="$PGDATA/postgresql.conf"
 
-# 设置参数
-psql -c "ALTER SYSTEM SET fsync = off"
-psql -c "ALTER SYSTEM SET wal_level  = 'minimal';"
-psql -c "ALTER SYSTEM SET synchronous_commit = off;"
-psql -c "ALTER SYSTEM SET polar_force_unlogged_to_logged_table = 'false';"
-psql -c "ALTER SYSTEM SET max_wal_senders  = '0';"
-#内存
-psql -c "ALTER SYSTEM SET work_mem = 4096;"
-psql -c "ALTER SYSTEM SET max_connections = 50;"
-psql -c "ALTER SYSTEM SET polar_bulk_read_size = '128kB';"
-psql -c "ALTER SYSTEM SET polar_bulk_extend_size = '8MB';"
-psql -c "ALTER SYSTEM SET maintenance_work_mem  = '1024MB';"
-psql -c "ALTER SYSTEM SET polar_rel_size_cache_blocks  = '20';"
-# 并行
-psql -c "ALTER SYSTEM SET max_parallel_workers  = '16';"
-psql -c "ALTER SYSTEM SET max_parallel_maintenance_workers  = '8';"
-psql -c "ALTER SYSTEM SET max_worker_processes  = '32';"
-psql -c "ALTER SYSTEM SET max_parallel_workers_per_gather  = '8';"
-psql -c "ALTER SYSTEM SET min_parallel_table_scan_size  = '0';"
-psql -c "ALTER SYSTEM SET min_parallel_index_scan_size  = '0';"
-psql -c "ALTER SYSTEM SET parallel_tuple_cost  = '0';"
-psql -c "ALTER SYSTEM SET parallel_setup_cost  = '0';"
-psql -c "ALTER SYSTEM SET cpu_tuple_cost  = '0';"
-psql -c "ALTER SYSTEM SET cpu_index_tuple_cost  = '0';"
-psql -c "ALTER SYSTEM SET polar_parallel_bgwriter_workers  = '8';"
-
-psql -c "ALTER SYSTEM SET max_stack_depth  = '2MB';"
-psql -c "ALTER SYSTEM SET bgwriter_delay  = '40';"
-psql -c "ALTER SYSTEM SET max_wal_size  = '1024';"
-psql -c "ALTER SYSTEM SET track_counts  = 'false';"
-psql -c "ALTER SYSTEM SET track_activities  = 'false';"
-psql -c "ALTER SYSTEM SET shared_buffers  = '2GB';"
-psql -c "ALTER SYSTEM SET checkpoint_timeout  = '86400';"
-psql -c "ALTER SYSTEM SET polar_create_table_with_full_replica_identity  = 'false';"
-psql -c "ALTER SYSTEM SET polar_create_table_with_full_replica_identity  = 'false';"
-psql -c "ALTER SYSTEM SET polar_skip_fill_walfile_zero_page  = 'true';"
-psql -c "ALTER SYSTEM SET polar_wal_pipeline_enable  = 'true';"
-psql -c "ALTER SYSTEM SET polar_index_create_bulk_extend_size  = '32MB';"
-psql -c "ALTER SYSTEM SET max_wal_size  = '100MB';"
-psql -c "ALTER SYSTEM SET logging_collector  = 'off';"
+# => 修改配置文件，关闭 fsync 以提升性能
+cat >> "$CONFIG_FILE" << EOF
+fsync = off
+wal_level  = 'minimal'
+max_wal_senders  = '0'
+EOF
 
 # => 重启数据库
 export PATH="$BASE_DIR/tmp_polardb_pg_15_base/bin:$PATH"

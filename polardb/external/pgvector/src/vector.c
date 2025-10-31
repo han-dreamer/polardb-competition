@@ -552,6 +552,7 @@ VectorL2SquaredDistance(int dim, float *ax, float *bx)
 	float		distance = 0.0;
 
 	/* Auto-vectorized */
+#pragma unroll
 	for (int i = 0; i < dim; i++)
 	{
 		float		diff = ax[i] - bx[i];
@@ -599,6 +600,7 @@ VectorInnerProduct(int dim, float *ax, float *bx)
 	float		distance = 0.0;
 
 	/* Auto-vectorized */
+#pragma unroll
 	for (int i = 0; i < dim; i++)
 		distance += ax[i] * bx[i];
 

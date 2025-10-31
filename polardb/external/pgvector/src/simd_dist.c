@@ -79,8 +79,16 @@ scalar_dot(int dim, const float *a, const float *b)
     return sum;
 }
 
+#if defined(__GNUC__) || defined(__clang__)
+#define ATTR_AVX2FMA __attribute__((target("avx2,fma")))
+#define ATTR_NOINLINE __attribute__((noinline))
+#else
+#define ATTR_AVX2FMA
+#define ATTR_NOINLINE
+#endif
+
 /* AVX2 implementations (handles tail) */
-static float
+static float ATTR_NOINLINE ATTR_AVX2FMA
 avx2_l2(int dim, const float *a, const float *b)
 {
     int i = 0;
@@ -114,7 +122,7 @@ avx2_l2(int dim, const float *a, const float *b)
     return sum;
 }
 
-static float
+static float ATTR_NOINLINE ATTR_AVX2FMA
 avx2_dot(int dim, const float *a, const float *b)
 {
     int i = 0;

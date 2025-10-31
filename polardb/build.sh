@@ -280,21 +280,3 @@ echo "PGPORT=$port" >> src/Makefile.precheck
 warn "Following command can be used to connect to PolarDB:"
 info "export PATH=$base_dir/bin:\$PATH"
 info $connstr
-
-# PolarDB 安装目录
-BASE_DIR="$HOME"
-
-# PolarDB DATA/BIN 目录
-PGDATA="$BASE_DIR/tmp_polardb_pg_15_primary"
-CONFIG_FILE="$PGDATA/postgresql.conf"
-
-# => 修改配置文件，关闭 fsync 以提升性能
-cat >> "$CONFIG_FILE" << EOF
-fsync = off
-wal_level  = 'minimal'
-max_wal_senders  = '0'
-EOF
-
-# => 重启数据库
-export PATH="$BASE_DIR/tmp_polardb_pg_15_base/bin:$PATH"
-pg_ctl -D "$PGDATA" restart

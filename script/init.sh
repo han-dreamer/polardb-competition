@@ -1,7 +1,19 @@
-!#/bin/bash
+#!/bin/bash
 
 # $BASE_DIR 项目根目录
-BASE_DIR=/workspaces/polardb_competition_2025/
+BASE_DIR=/workspaces/polardb_competition_2025
+
+cd $BASE_DIR/test
+
+# install python
+sudo apt-get install -y python3-pip python3-requests python3-venv
+
+# create and activate venv
+python3 -m venv pg-venv
+source pg-venv/bin/activate
+
+# install python dep
+pip3 install psycopg2 numpy h5py -i https://mirrors.aliyun.com/pypi/simple/
 
 # 数据集下载目录
 DATASET_DIR="$BASE_DIR/test"
@@ -44,3 +56,29 @@ for dataset in "${datasets[@]}"; do
     url=$(echo $dataset | awk '{print $2}')
     download_dataset "$name" "$url"
 done
+
+cd $BASE_DIR/polardb
+# 可以使用 bash build.sh --help 查看可以配置的选项
+bash build.sh --port=5432 --prefix="$HOME"
+
+# PolarDB 安装目录
+BASE_DIR="$HOME"
+
+# PolarDB DATA/BIN 目录
+PGDATA="$BASE_DIR/tmp_polardb_pg_15_primary"
+CONFIG_FILE="$PGDATA/postgresql.conf"
+
+# 设置参数
+cat >> "$CONFIG_FILE" << EOF
+
+shared_buffers = 16GB
+polar_xlog_queue_buffers = 2GB
+maintenance_work_mem = 8GB
+max_parallel_maintenance_workers = 16
+max_parallel_workers = 16
+
+EOF
+
+# => 重启数据库
+export PATH="$BASE_DIR/tmp_polardb_pg_15_base/bin:$PATH"
+pg_ctl -D "$PGDATA" restart

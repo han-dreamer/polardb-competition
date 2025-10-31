@@ -557,19 +557,18 @@ VectorL2SquaredDistance(int dim, float *ax, float *bx)
 	float		distance6 = 0.0;
 	float		distance7 = 0.0;
 	float		distance8 = 0.0;
-	int i = 0;
+	int			i = 0;
 
-	// 8-way loop unrolling
 	for (; i + 7 < dim; i += 8)
 	{
-		float diff1 = ax[i] - bx[i];
-		float diff2 = ax[i+1] - bx[i+1];
-		float diff3 = ax[i+2] - bx[i+2];
-		float diff4 = ax[i+3] - bx[i+3];
-		float diff5 = ax[i+4] - bx[i+4];
-		float diff6 = ax[i+5] - bx[i+5];
-		float diff7 = ax[i+6] - bx[i+6];
-		float diff8 = ax[i+7] - bx[i+7];
+		float		diff1 = ax[i] - bx[i];
+		float		diff2 = ax[i + 1] - bx[i + 1];
+		float		diff3 = ax[i + 2] - bx[i + 2];
+		float		diff4 = ax[i + 3] - bx[i + 3];
+		float		diff5 = ax[i + 4] - bx[i + 4];
+		float		diff6 = ax[i + 5] - bx[i + 5];
+		float		diff7 = ax[i + 6] - bx[i + 6];
+		float		diff8 = ax[i + 7] - bx[i + 7];
 
 		distance1 += diff1 * diff1;
 		distance2 += diff2 * diff2;
@@ -581,10 +580,10 @@ VectorL2SquaredDistance(int dim, float *ax, float *bx)
 		distance8 += diff8 * diff8;
 	}
 
-	// Handle remaining elements
 	for (; i < dim; i++)
 	{
 		float		diff = ax[i] - bx[i];
+
 		distance1 += diff * diff;
 	}
 

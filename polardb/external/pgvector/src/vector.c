@@ -549,17 +549,46 @@ halfvec_to_vector(PG_FUNCTION_ARGS)
 VECTOR_TARGET_CLONES static float
 VectorL2SquaredDistance(int dim, float *ax, float *bx)
 {
-	float		distance = 0.0;
+	float		distance1 = 0.0;
+	float		distance2 = 0.0;
+	float		distance3 = 0.0;
+	float		distance4 = 0.0;
+	float		distance5 = 0.0;
+	float		distance6 = 0.0;
+	float		distance7 = 0.0;
+	float		distance8 = 0.0;
+	int i = 0;
 
-	/* Auto-vectorized */
-	for (int i = 0; i < dim; i++)
+	// 8-way loop unrolling
+	for (; i + 7 < dim; i += 8)
 	{
-		float		diff = ax[i] - bx[i];
+		float diff1 = ax[i] - bx[i];
+		float diff2 = ax[i+1] - bx[i+1];
+		float diff3 = ax[i+2] - bx[i+2];
+		float diff4 = ax[i+3] - bx[i+3];
+		float diff5 = ax[i+4] - bx[i+4];
+		float diff6 = ax[i+5] - bx[i+5];
+		float diff7 = ax[i+6] - bx[i+6];
+		float diff8 = ax[i+7] - bx[i+7];
 
-		distance += diff * diff;
+		distance1 += diff1 * diff1;
+		distance2 += diff2 * diff2;
+		distance3 += diff3 * diff3;
+		distance4 += diff4 * diff4;
+		distance5 += diff5 * diff5;
+		distance6 += diff6 * diff6;
+		distance7 += diff7 * diff7;
+		distance8 += diff8 * diff8;
 	}
 
-	return distance;
+	// Handle remaining elements
+	for (; i < dim; i++)
+	{
+		float		diff = ax[i] - bx[i];
+		distance1 += diff * diff;
+	}
+
+	return distance1 + distance2 + distance3 + distance4 + distance5 + distance6 + distance7 + distance8;
 }
 
 /*
@@ -596,13 +625,34 @@ vector_l2_squared_distance(PG_FUNCTION_ARGS)
 VECTOR_TARGET_CLONES static float
 VectorInnerProduct(int dim, float *ax, float *bx)
 {
-	float		distance = 0.0;
+	float		distance1 = 0.0;
+	float		distance2 = 0.0;
+	float		distance3 = 0.0;
+	float		distance4 = 0.0;
+	float		distance5 = 0.0;
+	float		distance6 = 0.0;
+	float		distance7 = 0.0;
+	float		distance8 = 0.0;
+	int i = 0;
 
-	/* Auto-vectorized */
-	for (int i = 0; i < dim; i++)
-		distance += ax[i] * bx[i];
+	// 8-way loop unrolling
+	for (; i + 7 < dim; i += 8)
+	{
+		distance1 += ax[i] * bx[i];
+		distance2 += ax[i+1] * bx[i+1];
+		distance3 += ax[i+2] * bx[i+2];
+		distance4 += ax[i+3] * bx[i+3];
+		distance5 += ax[i+4] * bx[i+4];
+		distance6 += ax[i+5] * bx[i+5];
+		distance7 += ax[i+6] * bx[i+6];
+		distance8 += ax[i+7] * bx[i+7];
+	}
 
-	return distance;
+	// Handle remaining elements
+	for (; i < dim; i++)
+		distance1 += ax[i] * bx[i];
+
+	return distance1 + distance2 + distance3 + distance4 + distance5 + distance6 + distance7 + distance8;
 }
 
 /*
@@ -617,17 +667,51 @@ inner_product(PG_FUNCTION_ARGS)
 
 	CheckDims(a, b);
 
-	PG_RETURN_FLOAT8((double) VectorInnerProduct(a->dim, a->x, b->x));
-}
-
+	float		similarity1 = 0.0;
+	float		norma1 = 0.0;
+	float		normb1 = 0.0;
+	float		similarity2 = 0.0;
+	float		norma2 = 0.0;
+	float		normb2 = 0.0;
+	float		similarity3 = 0.0;
+	float		norma3 = 0.0;
+	float		normb3 = 0.0;
+	float		similarity4 = 0.0;
+	float		norma4 = 0.0;
+	float		normb4 = 0.0;
+	int i = 0;
 /*
- * Get the negative inner product of two vectors
- */
+	// 4-way loop unrolling
+	for (; i + 3 < dim; i += 4)
 FUNCTION_PREFIX PG_FUNCTION_INFO_V1(vector_negative_inner_product);
-Datum
-vector_negative_inner_product(PG_FUNCTION_ARGS)
-{
+		similarity1 += ax[i] * bx[i];
+		norma1 += ax[i] * ax[i];
+		normb1 += bx[i] * bx[i];
+
+		similarity2 += ax[i+1] * bx[i+1];
+		norma2 += ax[i+1] * ax[i+1];
+		normb2 += bx[i+1] * bx[i+1];
+
+		similarity3 += ax[i+2] * bx[i+2];
+		norma3 += ax[i+2] * ax[i+2];
+		normb3 += bx[i+2] * bx[i+2];
+
+		similarity4 += ax[i+3] * bx[i+3];
+		norma4 += ax[i+3] * ax[i+3];
+		normb4 += bx[i+3] * bx[i+3];
 	Vector	   *a = PG_GETARG_VECTOR_P(0);
+
+	// Handle remaining elements
+	for (; i < dim; i++)
+	{
+		similarity1 += ax[i] * bx[i];
+		norma1 += ax[i] * ax[i];
+		normb1 += bx[i] * bx[i];
+	}
+
+	float similarity = similarity1 + similarity2 + similarity3 + similarity4;
+	float norma = norma1 + norma2 + norma3 + norma4;
+	float normb = normb1 + normb2 + normb3 + normb4;
 	Vector	   *b = PG_GETARG_VECTOR_P(1);
 
 	CheckDims(a, b);

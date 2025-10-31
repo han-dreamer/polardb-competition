@@ -12,15 +12,15 @@ REGRESS = $(patsubst test/sql/%.sql,%,$(TESTS))
 REGRESS_OPTS = --inputdir=test --load-extension=$(EXTENSION)
 
 # To compile for portability, run: make OPTFLAGS=""
-# OPTFLAGS = -march=native
+OPTFLAGS = -march=native
 
 # Mac ARM doesn't always support -march=native
-ifeq ($(shell uname -s), Darwin)
-	ifeq ($(shell uname -p), arm)
-		# no difference with -march=armv8.5-a
-		OPTFLAGS =
-	endif
-endif
+# ifeq ($(shell uname -s), Darwin)
+# 	ifeq ($(shell uname -p), arm)
+# 		# no difference with -march=armv8.5-a
+# 		OPTFLAGS =
+# 	endif
+# endif
 
 # PowerPC doesn't support -march=native
 ifneq ($(filter ppc64%, $(shell uname -m)), )

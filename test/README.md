@@ -114,9 +114,9 @@
     # 设置参数
     cat >> "$CONFIG_FILE" << EOF
 
-    shared_buffers = 12GB
+    shared_buffers = 4GB
     polar_xlog_queue_buffers = 2GB
-    maintenance_work_mem = 8GB
+    maintenance_work_mem = 4GB
     max_parallel_maintenance_workers = 16
     max_parallel_workers = 16
 
@@ -190,7 +190,7 @@
     psql -h 127.0.0.1 -p 5432 -U "$USER" -d "$DBNAME" << EOF
     CREATE INDEX ON vector_table 
     USING hnsw (embedding vector_l2_ops) 
-    WITH (m = 16, ef_construction = 64);
+    WITH (m = 4, ef_construction = 8);
     EOF
 
     -- 创建 IVFFLAT 索引

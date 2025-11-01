@@ -114,7 +114,7 @@
     # 设置参数
     cat >> "$CONFIG_FILE" << EOF
 
-    shared_buffers = 16GB
+    shared_buffers = 12GB
     polar_xlog_queue_buffers = 2GB
     maintenance_work_mem = 8GB
     max_parallel_maintenance_workers = 16
@@ -146,7 +146,7 @@
     EOF
     
     # 根据向量维度创建表结构
-    VECTOR_DIM=100
+    VECTOR_DIM=784
     # 创建插件与测试表
     psql -h 127.0.0.1 -p 5432 -U "$USER" -d "$DBNAME" << EOF
     -- 创建插件
@@ -164,7 +164,7 @@
     USER="testuser"
     PASSWORD="testPawword"
     DBNAME="testdb"
-    DATASET_NAME=
+    DATASET_NAME="fashion-mnist-784-euclidean"
 
     # cd $BASE_DIR/test && source pg-venv/bin/activate
     python3 load.py \
@@ -187,9 +187,11 @@
     
     ```sql
     -- 创建 HNSW 索引
+    psql -h 127.0.0.1 -p 5432 -U "$USER" -d "$DBNAME" << EOF
     CREATE INDEX ON vector_table 
     USING hnsw (embedding vector_l2_ops) 
     WITH (m = 16, ef_construction = 64);
+    EOF
 
     -- 创建 IVFFLAT 索引
     CREATE INDEX ON vector_table
@@ -203,7 +205,7 @@
 USER="testuser"
 PASSWORD="testPawword"
 DBNAME="testdb"
-DATASET_NAME=
+DATASET_NAME="fashion-mnist-784-euclidean"
 
 # 基本使用方式
 usage: query.py 
@@ -267,7 +269,7 @@ usage: query.py
 USER="testuser"
 PASSWORD="testPawword"
 DBNAME="testdb"
-DATASET_NAME=
+DATASET_NAME="fashion-mnist-784-euclidean"
 
 python3 query.py \
   --host 127.0.0.1 \
@@ -290,7 +292,7 @@ python3 query.py \
 USER="testuser"
 PASSWORD="testPawword"
 DBNAME="testdb"
-DATASET_NAME=
+DATASET_NAME="fashion-mnist-784-euclidean"
 
 python3 query.py \
   --host 127.0.0.1 \
@@ -313,7 +315,7 @@ python3 query.py \
 USER="testuser"
 PASSWORD="testPawword"
 DBNAME="testdb"
-DATASET_NAME=
+DATASET_NAME="fashion-mnist-784-euclidean"
 
 python3 query.py \
   --host 127.0.0.1 \

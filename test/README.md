@@ -33,7 +33,7 @@
     "nytimes-256-angular": 301 MB, 256 x 290,000, Angular (Cosine)
     "nytimes-16-angular": 26 MB, 16 x 290,000, Angular (Cosine)
     "lastfm-64-dot": 135 MB, 65 x 292,385, Angular (Cosine)
-    wget http://ann-benchmarks.com/nytimes-16-angular.hdf5
+    wget http://ann-benchmarks.com/mnist-784-euclidean.hdf5
     
     # 使用 wget https://github.com/fabiocarrara/str-encoders/releases/download/v0.1.3/{dataset_name}.hdf5 的方式拉取数据
     "coco-i2i-512-angular": 136 MB, 512 x 113,287, Angular (Cosine)
@@ -148,7 +148,7 @@
     EOF
     
     # 根据向量维度创建表结构
-    VECTOR_DIM=16
+    VECTOR_DIM=784
     # 创建插件与测试表
     psql -h 127.0.0.1 -p 5432 -U "$USER" -d "$DBNAME" << EOF
     -- 创建插件
@@ -166,7 +166,7 @@
     USER="testuser"
     PASSWORD="testPawword"
     DBNAME="testdb"
-    DATASET_NAME="nytimes-16-angular"
+    DATASET_NAME="mnist-784-euclidean"
 
     # cd $BASE_DIR/test && source pg-venv/bin/activate
     python3 load.py \
@@ -207,7 +207,7 @@
 USER="testuser"
 PASSWORD="testPawword"
 DBNAME="testdb"
-DATASET_NAME="nytimes-16-angular"
+DATASET_NAME="mnist-784-euclidean"
 
 # 基本使用方式
 usage: query.py 
@@ -221,7 +221,7 @@ usage: query.py
   [--query_num QUERY_NUM] [--offset OFFSET]
   
  python3 query.py \
-    --hdf5_file nytimes-16-angular.hdf5 \
+    --hdf5_file mnist-784-euclidean.hdf5 \
     --table_name vector_table \
     --host 127.0.0.1 \
     --port 5432 \

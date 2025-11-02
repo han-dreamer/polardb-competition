@@ -4,7 +4,7 @@ set -e  # 遇到错误时退出脚本
 # 清理临时文件并进入工作目录
 cd ~
 rm -rf tmp_*
-cd ./gitee/polardb_competition_2025/test/
+cd polardb_competition_2025/test/
 source pg-venv/bin/activate  # 激活虚拟环境
 cd ../polardb/
 

@@ -145,7 +145,7 @@ prefix=$HOME
 port=$(random_unused_port)
 
 # 2.2 complie options
-debug=on
+debug=off
 minimal=off
 compiler_flag="-g -pipe -Wall -fno-omit-frame-pointer -fsigned-char"
 # disable origin rpath config because of our own rpath config in LDFLAGS

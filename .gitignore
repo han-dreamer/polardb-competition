@@ -49,3 +49,4 @@ pg-venv/
 /.idea/
 /.vscode/
 /autom4te.cache/
+/FlameGraph

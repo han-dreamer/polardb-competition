@@ -1,0 +1,38 @@
+docker attach polardb_competition_2025_devel
+
+sudo ss -tlnp | grep 5432
+
+sudo perf record -F 99 -p 19113 -g
+
+# 数据库用户和库配置
+USER="testuser"
+PASSWORD="testPawword"
+DBNAME="testdb"
+BASE_DIR="$HOME"
+PGDATA="$BASE_DIR/tmp_polardb_pg_15_primary"
+CONFIG_FILE="$PGDATA/postgresql.conf"
+DATASET_NAME="mnist-784-euclidean"
+python3 query.py \
+  --host 127.0.0.1 \
+  --port 5432 \
+  --database "$DBNAME" \
+  --user "$USER" \
+  --password "$PASSWORD" \
+  --table_name vector_table \
+  --hdf5_file "${DATASET_NAME}.hdf5" \
+  --k 10 \
+  --metric l2 \
+  --max_vid 1000000 \
+  --workers 8 \
+  --pgvector_hnsw_ef_search 120
+
+
+sudo perf script -i perf.data &> perf.unfold
+
+./stackcollapse-perf.pl perf.unfold &> perf.folded
+./flamegraph.pl perf.folded > perf.svg
+
+
+
+    
+

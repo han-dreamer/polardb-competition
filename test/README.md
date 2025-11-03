@@ -33,10 +33,12 @@
     "nytimes-256-angular": 301 MB, 256 x 290,000, Angular (Cosine)
     "nytimes-16-angular": 26 MB, 16 x 290,000, Angular (Cosine)
     "lastfm-64-dot": 135 MB, 65 x 292,385, Angular (Cosine)
+    wget http://ann-benchmarks.com/mnist-784-euclidean.hdf5
     
     # 使用 wget https://github.com/fabiocarrara/str-encoders/releases/download/v0.1.3/{dataset_name}.hdf5 的方式拉取数据
     "coco-i2i-512-angular": 136 MB, 512 x 113,287, Angular (Cosine)
     "coco-t2i-512-angular": 136 MB, 512 x 113,287, Angular (Cosine)
+    wget https://github.com/fabiocarrara/str-encoders/releases/download/v0.1.3/coco-t2i-512-angular.hdf5
     ```
     *   推荐使用 [ann-benchmarks](https://github.com/erikbern/ann-benchmarks) 中提供的数据数据集
         
@@ -108,22 +110,22 @@
     ```bash
     # PolarDB 安装目录
     BASE_DIR="$HOME"
-
+    
     # PolarDB DATA/BIN 目录
     PGDATA="$BASE_DIR/tmp_polardb_pg_15_primary"
     CONFIG_FILE="$PGDATA/postgresql.conf"
-
+    
     # 设置参数
     cat >> "$CONFIG_FILE" << EOF
-
-    shared_buffers = 16GB
-    polar_xlog_queue_buffers = 2GB
-    maintenance_work_mem = 8GB
-    max_parallel_maintenance_workers = 16
-    max_parallel_workers = 16
-
+    
+    shared_buffers = 2GB
+    polar_xlog_queue_buffers = 256MB
+    maintenance_work_mem = 1GB
+    max_parallel_maintenance_workers = 2
+    max_parallel_workers = 2
+    
     EOF
-
+    
     # => 重启数据库
     export PATH="$BASE_DIR/tmp_polardb_pg_15_base/bin:$PATH"
     pg_ctl -D "$PGDATA" restart
@@ -148,7 +150,7 @@
     EOF
     
     # 根据向量维度创建表结构
-    VECTOR_DIM=100
+    VECTOR_DIM=784
     # 创建插件与测试表
     psql -h 127.0.0.1 -p 5432 -U "$USER" -d "$DBNAME" << EOF
     -- 创建插件
@@ -166,7 +168,7 @@
     USER="testuser"
     PASSWORD="testPawword"
     DBNAME="testdb"
-    DATASET_NAME=
+    DATASET_NAME="mnist-784-euclidean"
 
     # cd $BASE_DIR/test && source pg-venv/bin/activate
     python3 load.py \
@@ -188,11 +190,13 @@
     *   需要注意创建向量索引使用的操作符类型，如果使用的向量索引操作符类型与查询搜索时使用的类型不匹配，查找时将无法利用索引加速，当前主要使用 vector_l2_ops(<->)/vector_cosine_ops(<=>)/vector_ip_ops(<#>) 这三种操作符
     
     ```sql
+    psql -h 127.0.0.1 -p 5432 -U testuser -d testdb -W  # 输入密码 testPawword
+    
     -- 创建 HNSW 索引
     CREATE INDEX ON vector_table 
     USING hnsw (embedding vector_l2_ops) 
     WITH (m = 16, ef_construction = 64);
-
+    
     -- 创建 IVFFLAT 索引
     CREATE INDEX ON vector_table
     USING ivfflat (embedding vector_l2_ops)
@@ -205,7 +209,7 @@
 USER="testuser"
 PASSWORD="testPawword"
 DBNAME="testdb"
-DATASET_NAME=
+DATASET_NAME="mnist-784-euclidean"
 
 # 基本使用方式
 usage: query.py 
@@ -217,12 +221,21 @@ usage: query.py
   [--pgvector_hnsw_ef_search PGVECTOR_HNSW_EF_SEARCH] 
   [--pgvector_ivf_probes PGVECTOR_IVF_PROBES]
   [--query_num QUERY_NUM] [--offset OFFSET]
+  
+ python3 query.py \
+    --hdf5_file mnist-784-euclidean.hdf5 \
+    --table_name vector_table \
+    --host 127.0.0.1 \
+    --port 5432 \
+    --database testdb \
+    --user testuser \
+    --password testPassword
 ```
 
 *   `--hdf5_file`: 指定 HDF5 格式的输入文件路径，包含测试向量和真实近邻数据
     
 ### 数据库连接参数
-    
+
 *   `--host`: PostgreSQL 数据库主机地址，默认为 127.0.0.1
     
 *   `--port`: PostgreSQL 数据库端口号，默认为 5432

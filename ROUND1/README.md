@@ -6,7 +6,7 @@
 
 ## 测评环境
 
-在提交后数据库将被部署在一个 16C 32GB Intel(R) Xeon(R) 6982P-C 的容器环境中进行测试，数据库运行镜像基于 [polardb-pg-docker-devel-ubuntu24.04](https://github.com/ApsaraDB/polardb-pg-docker-images/blob/main/Dockerfile-devel-ubuntu24.04)
+在提交后数据库将被部署在一个 16C 32GB 的容器环境中进行测试，数据库运行镜像基于 [polardb-pg-docker-devel-ubuntu24.04](https://github.com/ApsaraDB/polardb-pg-docker-images/blob/main/Dockerfile-devel-ubuntu24.04)
 
 ## 测评流程
 

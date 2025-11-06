@@ -39,6 +39,8 @@
     "coco-t2i-512-angular": 136 MB, 512 x 113,287, Angular (Cosine)
     ```
     *   推荐使用 [ann-benchmarks](https://github.com/erikbern/ann-benchmarks) 中提供的数据数据集
+
+    *   如果无法拉取数据集，可以到 [天池平台](https://tianchi.aliyun.com/competition/entrance/532409/information) 上下载数据集
         
 
 ## 拉取镜像并运行容器

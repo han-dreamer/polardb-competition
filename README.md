@@ -27,10 +27,12 @@
 ![plot](./img/commit-001.png)
 
 ![plot](./img/commit-002.png)
+
+![plot](./img/commit-003.png)
     
 5.  等待测试完成，运行结果与运行日志可以点击「我的成绩」查看
     
-![plot](./img/commit-003.png)
+![plot](./img/commit-004.png)
 
 ## 本地自测流程
 

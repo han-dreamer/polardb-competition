@@ -14,6 +14,7 @@
 #include "lib/stringinfo.h"
 #include "libpq/pqformat.h"
 #include "port.h"				/* for strtof() */
+#include "simd_distance.h"
 #include "sparsevec.h"
 #include "utils/array.h"
 #include "utils/builtins.h"
@@ -52,6 +53,7 @@ _PG_init(void)
 	HalfvecInit();
 	HnswInit();
 	IvfflatInit();
+	simd_init();  /* Initialize SIMD support detection */
 }
 
 /*
@@ -549,17 +551,8 @@ halfvec_to_vector(PG_FUNCTION_ARGS)
 VECTOR_TARGET_CLONES static float
 VectorL2SquaredDistance(int dim, float *ax, float *bx)
 {
-	float		distance = 0.0;
-
-	/* Auto-vectorized */
-	for (int i = 0; i < dim; i++)
-	{
-		float		diff = ax[i] - bx[i];
-
-		distance += diff * diff;
-	}
-
-	return distance;
+	/* Use SIMD-optimized version */
+	return simd_l2_squared_distance(dim, ax, bx);
 }
 
 /*
@@ -596,13 +589,8 @@ vector_l2_squared_distance(PG_FUNCTION_ARGS)
 VECTOR_TARGET_CLONES static float
 VectorInnerProduct(int dim, float *ax, float *bx)
 {
-	float		distance = 0.0;
-
-	/* Auto-vectorized */
-	for (int i = 0; i < dim; i++)
-		distance += ax[i] * bx[i];
-
-	return distance;
+	/* Use SIMD-optimized version */
+	return simd_inner_product(dim, ax, bx);
 }
 
 /*
@@ -638,20 +626,8 @@ vector_negative_inner_product(PG_FUNCTION_ARGS)
 VECTOR_TARGET_CLONES static double
 VectorCosineSimilarity(int dim, float *ax, float *bx)
 {
-	float		similarity = 0.0;
-	float		norma = 0.0;
-	float		normb = 0.0;
-
-	/* Auto-vectorized */
-	for (int i = 0; i < dim; i++)
-	{
-		similarity += ax[i] * bx[i];
-		norma += ax[i] * ax[i];
-		normb += bx[i] * bx[i];
-	}
-
-	/* Use sqrt(a * b) over sqrt(a) * sqrt(b) */
-	return (double) similarity / sqrt((double) norma * (double) normb);
+	/* Use SIMD-optimized version */
+	return simd_cosine_similarity(dim, ax, bx);
 }
 
 /*
@@ -714,13 +690,8 @@ vector_spherical_distance(PG_FUNCTION_ARGS)
 VECTOR_TARGET_CLONES static float
 VectorL1Distance(int dim, float *ax, float *bx)
 {
-	float		distance = 0.0;
-
-	/* Auto-vectorized */
-	for (int i = 0; i < dim; i++)
-		distance += fabsf(ax[i] - bx[i]);
-
-	return distance;
+	/* Use SIMD-optimized version */
+	return simd_l1_distance(dim, ax, bx);
 }
 
 /*

@@ -414,7 +414,7 @@ static inline double
 fallback_cosine_similarity(int dim, const float *ax, const float *bx)
 {
 	float dot, norm_a, norm_b;
-	int i;
+	int i = 0;
 
 	dot = 0.0f;
 	norm_a = 0.0f;
@@ -542,7 +542,7 @@ static inline float
 fallback_l1_distance(int dim, const float *ax, const float *bx)
 {
 	float distance;
-	int i;
+	int i = 0;
 
 	distance = 0.0f;
 
